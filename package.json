@@ -10,7 +10,7 @@
     "test": "mocha"
   },
   "engines": {
-    "node": ">=0.8.0"
+    "node": ">=4.0.0"
   },
   "keywords": [
     "sleep",
@@ -19,9 +19,6 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/erikdubbelboer/node-sleep.git"
-  },
-  "dependencies": {
-    "nan": ">=2.0.0"
   },
   "devDependencies": {
     "mocha": "^3.0.2"

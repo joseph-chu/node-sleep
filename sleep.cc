@@ -1,12 +1,14 @@
 
-#include <nan.h>
+#include <node.h>
 
-
-using v8::FunctionTemplate;
+using v8::Exception;
+using v8::FunctionCallbackInfo;
+using v8::Isolate;
 using v8::Handle;
 using v8::Object;
 using v8::String;
-
+using v8::Local;
+using v8::Value;
 
 #if defined _WIN32 || defined _WIN64
 unsigned int sleep(unsigned int seconds)
@@ -32,11 +34,13 @@ int usleep(unsigned __int64 usec)
 #endif
 
 
-NAN_METHOD(Sleep) {
-  Nan::HandleScope scope;
+void Sleep (const FunctionCallbackInfo<Value>& info) {
+  Isolate* isolate = info.GetIsolate();
 
   if (info.Length() < 1 || !info[0]->IsUint32()) {
-    return Nan::ThrowError("Expected number of seconds");
+    isolate->ThrowException(Exception::TypeError(
+      String::NewFromUtf8(isolate, "Expected number of seconds")));
+    return;
   }
 
   sleep(info[0]->Uint32Value());
@@ -44,11 +48,13 @@ NAN_METHOD(Sleep) {
   info.GetReturnValue().SetUndefined();
 }
 
-NAN_METHOD(USleep) {
-  Nan::HandleScope scope;
+void USleep (const FunctionCallbackInfo<Value>& info) {
+  Isolate* isolate = info.GetIsolate();
 
   if (info.Length() < 1 || !info[0]->IsUint32()) {
-    return Nan::ThrowError("Expected number of microseconds");
+    isolate->ThrowException(Exception::TypeError(
+      String::NewFromUtf8(isolate, "Expected number of microseconds")));
+    return;
   }
 
   usleep(info[0]->Uint32Value());
@@ -56,14 +62,10 @@ NAN_METHOD(USleep) {
   info.GetReturnValue().SetUndefined();
 }
 
-
-NAN_MODULE_INIT(init) {
-  Nan::Set(target, Nan::New<String>("sleep").ToLocalChecked(),
-    Nan::New<FunctionTemplate>(Sleep)->GetFunction());
-  Nan::Set(target, Nan::New<String>("usleep").ToLocalChecked(),
-    Nan::New<FunctionTemplate>(USleep)->GetFunction());
+void init(Local<Object> exports) {
+  NODE_SET_METHOD(exports, "sleep", Sleep);
+  NODE_SET_METHOD(exports, "usleep", USleep);
 }
-
 
 NODE_MODULE(node_sleep, init)
 
